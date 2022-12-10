@@ -15,10 +15,10 @@ def read_red(n:int):
     tab = []
     for i in range(n+1):
         tab.append(red.readline().replace('\n','').split(';'))
-    return pd.DataFrame(tab[1:],columns=get_column_labels()) 
+    return pd.DataFrame(tab[1:],columns=get_column_labels()).astype('float') 
 
 def read_white(n:int):
     tab = []
     for i in range(n+1):
         tab.append(white.readline().replace('\n','').split(';'))
-    return pd.DataFrame(tab[1:],columns=get_column_labels()) 
+    return pd.DataFrame(tab[1:],columns=get_column_labels()).astype('float') 
