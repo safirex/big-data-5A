@@ -20,28 +20,11 @@ n_white = 200
 
 test :pd.DataFrame = rf.read_red(n_red)
 test = test.append(rf.read_white(n_white))
-
-pca = create_pca(test)
-data = pca.components_
-
-# show matrix of scatter over full every dimensions
-data = test
 colors = ['red']*n_red + ['gray']*n_white
-# colors = np.array(colors)
-# print(type(colors))
-# data = data.merge(pd.DataFrame(colors,columns=['color']),how='cross')
-# data.
-# print(data)
 
-fig = px.scatter_matrix(
-    data,
-    dimensions=data.columns,
-    color = colors
-)
-fig.update_traces(diagonal_visible=False)
-# fig.show()
-
-
+# pca = create_pca(test)
+# data = pca.components_
+data= test
 
 plt.subplot(211)
 plt.title("reality of wine type scattering")
@@ -51,7 +34,6 @@ fig2 = plt.scatter(
     data['volatile acidity'],
     color= colors
 )
-
 
 cluster = KMeans(n_clusters=2,random_state=0,n_init= 30).fit(data)
 points = cluster.cluster_centers_
@@ -63,24 +45,17 @@ fig2= plt.scatter(
     color = 'black'
 )
 
-
-
 plt.subplot(212)
 plt.title("kmean prediction of wine type scattering")
 
 # data = data[['fixed acidity','volatile acidity']].to_numpy()
 kmean = cluster.predict(data)
-print(kmean)
+points = cluster.cluster_centers_
 
-
-
-
-# filtered_label0 = [data[i] for i in range(len(kmean)) if kmean[i]==0]
 datas = data[['fixed acidity','volatile acidity']].to_numpy()
 
 filtered_label0 = datas[kmean == 0]
 filtered_label1 = datas[kmean == 1]
-# dat = filtered_label0 + filtered_label1
 
 fig = plt.scatter(
     filtered_label0[:,0], 
@@ -98,6 +73,70 @@ fig2= plt.scatter(
     color = 'black'
 )
 plt.show()
+
+
+
+# elbow method for k-means clustering 
+wcss = []
+
+for i in range(1, 13):
+    kmeans = KMeans(n_clusters = i, init = 'k-means++', max_iter = 300, n_init = 10, random_state = 0)
+    kmeans.fit(data)
+    print(kmeans.inertia_)
+    wcss.append(kmeans.inertia_)
+
+plt.plot(range(1, 13), wcss)
+plt.title('The elbow method')
+plt.xlabel('Number of clusters')
+plt.ylabel('WCSS') #within cluster sum of squares
+plt.show()
+
+# show matrix of scatter over full every dimensions
+data = test
+# colors = np.array(colors)
+# print(type(colors))
+# data = data.merge(pd.DataFrame(colors,columns=['color']),how='cross')
+# data.
+# print(data)
+
+fig = px.scatter_matrix(
+    data,
+    dimensions=data.columns,
+    color = colors
+)
+fig.update_traces(diagonal_visible=False)
+# fig.show()
+
+
+
+cluster = KMeans(n_clusters=4,random_state=0,n_init= 30).fit(data)
+points = cluster.cluster_centers_
+# show matrix of scatter over full every dimensions
+kmean= cluster.predict(data)
+data = test
+colors = ['red']*n_red + ['gray']*n_white
+colors = ['red','gray','green','blue']
+colors=  [colors[kmean[i]] for i in range(len(kmean))]
+
+
+# data = data.merge(pd.DataFrame(colors,columns=['color']),how='cross')
+
+fig = px.scatter_matrix(
+    data,
+    dimensions=data.columns,
+    color = colors
+)
+fig.update_traces(diagonal_visible=False)
+fig.show()
+
+
+
+
+
+
+
+
+
 # from sklearn.metrics import confusion_matrix
 # import seaborn  as sns
 
@@ -108,6 +147,9 @@ plt.show()
 #             yticklabels=digits.target_names)
 # plt.xlabel('true label')
 # plt.ylabel('predicted label');
+
+
+
 # data = test[['total sulfur dioxide','volatile acidity']]
 # pca = PCA(n_components=2)
 # pca.fit(np.transpose(data))
